@@ -327,6 +327,11 @@ Shelf Layout is a wrapping horizontal flex arrangement. There is no fixed
 `booksPerShelf` setting. The browser determines row breaks from the real
 available width.
 
+Every flex row has a full-width support directly below its books. The support
+repeats at the fixed row pitch, so a shelf remains aligned under every row as
+the container width changes and books wrap. Individual book heights still vary
+within each row and align at its support.
+
 Each book has a minimum width of `minSpineWidth`, a page-derived base width,
 and a page-derived flex weight. Books in a row expand to fill the available
 shelf width. Input order is never changed.

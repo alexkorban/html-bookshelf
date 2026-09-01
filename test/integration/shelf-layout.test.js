@@ -23,6 +23,8 @@ describe('Shelf Layout', () => {
     expect(fragment).toContain('--hbs-thickness:0.6')
     expect(fragment).toContain('--hbs-thickness:3')
     expect(fragment).toContain('hbs-book--leaning')
+    expect(fragment).toContain('hbs-book-slot')
+    expect(fragment).toContain('background-repeat: repeat-y')
     expect(fragment).toContain('[data-html-bookshelf] .hbs-list')
   })
 })

@@ -42,19 +42,55 @@ test('puts both contact points of the final leaning book exactly on its support'
 
   const contacts = await page.locator('.hbs-list').evaluate((list) => {
     const [supportingBook, leaningBook] = list.querySelectorAll('.hbs-book')
-    const listBox = list.getBoundingClientRect()
-    const angle = Number.parseFloat(getComputedStyle(leaningBook).getPropertyValue('--hbs-lean')) * (Math.PI / 180)
-    const shelfThickness = Number.parseFloat(getComputedStyle(list, '::after').height)
+    const supportingBox = supportingBook.getBoundingClientRect()
+    const leaningBox = leaningBook.getBoundingClientRect()
+    const leaningSlotBox = leaningBook.parentElement.getBoundingClientRect()
     return {
-      supportingRight: supportingBook.offsetLeft + supportingBook.offsetWidth,
-      leaningTopLeft: leaningBook.offsetLeft - (leaningBook.offsetHeight * Math.sin(angle)),
-      leaningBottom: leaningBook.offsetTop + leaningBook.offsetHeight,
-      shelfTop: listBox.height - shelfThickness
+      supportingRight: supportingBox.right,
+      leaningTopLeft: leaningBox.left,
+      leaningBottom: leaningBox.bottom,
+      shelfTop: leaningSlotBox.bottom
     }
   })
 
   expect(contacts.leaningTopLeft).toBeCloseTo(contacts.supportingRight, 0)
   expect(contacts.leaningBottom).toBeCloseTo(contacts.shelfTop, 0)
+})
+
+test('draws a full-width shelf under every wrapped row', async ({ page }) => {
+  await page.setContent('<div id="target" style="width: 16rem"></div>')
+  await page.addScriptTag({ path: 'dist/html-bookshelf.iife.js' })
+  await page.evaluate(() => window.HtmlBookshelf.mountBookshelf(document.querySelector('#target'), [
+    { title: 'Dune', author: 'Frank Herbert', pages: 412 },
+    { title: 'Kindred', author: 'Octavia E. Butler', pages: 288 },
+    { title: 'Piranesi', author: 'Susanna Clarke', pages: 272 },
+    { title: 'Beloved', author: 'Toni Morrison', pages: 324 },
+    { title: 'The Power', author: 'Naomi Alderman', pages: 384 },
+    { title: 'Homegoing', author: 'Yaa Gyasi', pages: 320 },
+    { title: 'The Fifth Season', author: 'N. K. Jemisin', pages: 512 },
+    { title: 'Possession', author: 'A. S. Byatt', pages: 576 }
+  ], { layout: 'shelf', minSpineWidth: '3rem', shelfStyle: 'wood' }))
+
+  const shelves = await page.locator('.hbs-list').evaluate((list) => {
+    const listBox = list.getBoundingClientRect()
+    const listStyle = getComputedStyle(list)
+    const shelfStyle = getComputedStyle(list, '::after')
+    const shelfThickness = Number.parseFloat(listStyle.getPropertyValue('--hbs-shelf-thickness')) * Number.parseFloat(listStyle.fontSize)
+    const rowPitch = Number.parseFloat(shelfStyle.backgroundSize.split(' ').at(-1))
+    const rowBaselines = Array.from(new Set(Array.from(list.querySelectorAll('.hbs-book-slot'), (slot) => Math.round((slot.getBoundingClientRect().bottom - listBox.top) * 100) / 100)))
+    const bandTops = Array.from({ length: rowBaselines.length }, (_, index) => listBox.height - shelfThickness - (index * rowPitch))
+    return {
+      backgroundImage: shelfStyle.backgroundImage,
+      bandTops,
+      repeatsVertically: shelfStyle.backgroundRepeat.split(', ').every((repeat) => repeat === 'repeat-y'),
+      rowBaselines
+    }
+  })
+
+  expect(shelves.rowBaselines.length).toBeGreaterThanOrEqual(2)
+  expect(shelves.backgroundImage).not.toBe('none')
+  expect(shelves.repeatsVertically).toBe(true)
+  expect(shelves.rowBaselines.toSorted((left, right) => right - left)).toEqual(expect.arrayContaining(shelves.bandTops.map((top) => expect.closeTo(top, 1))))
 })
 
 test('uses a Y-axis yaw for Stack Slab depth without turning its text', async ({ page }) => {
@@ -337,6 +373,28 @@ test('shrinks long along-spine Book Text to one line on a thin old-school spine'
   })
 
   expect(fit).toEqual({ inside: true, separate: true, singleLine: true })
+})
+
+test('shrinks long Along Spine Text to remain inside the book', async ({ page }) => {
+  await page.setContent('<div id="target" style="width: 20rem"></div>')
+  await page.addScriptTag({ path: 'dist/html-bookshelf.iife.js' })
+  await page.evaluate(() => window.HtmlBookshelf.mountBookshelf(document.querySelector('#target'), [
+    { title: 'The Left Hand of Darkness', author: 'Ursula K. Le Guin', pages: 304 }
+  ], { layout: 'shelf' }))
+
+  const fit = await page.locator('.hbs-title').filter({ hasText: 'The Left Hand of Darkness' }).evaluate((title) => {
+    const book = title.closest('.hbs-book')
+    const bookBox = book.getBoundingClientRect()
+    const titleBox = title.getBoundingClientRect()
+    const declaredSize = Number.parseFloat(getComputedStyle(book.parentElement).getPropertyValue('--hbs-title-size')) * Number.parseFloat(getComputedStyle(document.documentElement).fontSize)
+    return {
+      bottom: titleBox.bottom <= bookBox.bottom,
+      small: Number.parseFloat(getComputedStyle(title).fontSize) <= declaredSize,
+      top: titleBox.top >= bookBox.top
+    }
+  })
+
+  expect(fit).toEqual({ bottom: true, small: true, top: true })
 })
 
 test('leans the final old-school book against its neighbour', async ({ page }) => {

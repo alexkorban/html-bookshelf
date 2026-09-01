@@ -21,7 +21,7 @@ const bookMarkup = (book, leaning) => {
     : `${artwork}<a class="hbs-book-link" href="${htmlAttribute(book.url)}">${content}</a>`
   const font = book.font === undefined ? 'var(--hbs-theme-font)' : `"${R.replace(/"/g, '\\"', book.font)}", var(--hbs-theme-font)`
   const style = `--hbs-thickness:${book.relativeThickness};--hbs-height-variation:${book.heightVariation};--hbs-lean:${book.lean};--hbs-lean-angle:${book.lean}deg;--hbs-stack-yaw:${book.stackYaw};--hbs-stack-shift:${book.stackShift};--hbs-title-size:${book.titleSize}rem;--hbs-author-size:${book.authorSize}rem;--hbs-entrance-delay:${book.entranceDelay}ms;--hbs-font:${font}`
-  return `<li class="hbs-book hbs-theme-${book.theme} hbs-variant-${book.visualVariant} hbs-modern-${book.modernVariant}${book.acrossSpine ? ` hbs-text-eligible hbs-text-${book.acrossSpineWidth}` : ''}${leaning ? ' hbs-book--leaning' : ''}" style="${style}">${visibleBook}</li>`
+  return `<li class="hbs-book-slot${leaning ? ' hbs-book-slot--leaning' : ''}" style="${style}"><div class="hbs-book hbs-theme-${book.theme} hbs-variant-${book.visualVariant} hbs-modern-${book.modernVariant}${book.acrossSpine ? ` hbs-text-eligible hbs-text-${book.acrossSpineWidth}` : ''}${leaning ? ' hbs-book--leaning' : ''}">${visibleBook}</div></li>`
 }
 
 /**
