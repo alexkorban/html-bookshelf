@@ -35,13 +35,13 @@
           { title: 'Kindred', author: 'Octavia Butler', pages: 288 },
           { title: 'Piranesi', author: 'Susanna Clarke', pages: 272 }
         ]
-        HtmlBookshelf.mountBookshelf(document.querySelector('#vertical-spine'), verticalSpines, { theme: 'modern', layout: 'shelf', shelfStyle: 'wood', label: 'Vertical spine text' })
+        HtmlBookshelf.mountBookshelf(document.querySelector('#vertical-spine'), verticalSpines, { theme: 'modern', layout: 'shelf', shelfStyle: 'wood', animation: true, label: 'Vertical spine text' })
         HtmlBookshelf.mountBookshelf(document.querySelector('#across-spine'), acrossSpines, { theme: 'modern', layout: 'shelf', shelfStyle: 'wood', label: 'Across Spine Text' })
         HtmlBookshelf.mountBookshelf(document.querySelector('#modern'), books, { theme: 'modern', shelfStyle: 'abstract', label: 'Modern Bookshelf' })
         HtmlBookshelf.mountBookshelf(document.querySelector('#academic'), books, { theme: 'academic', shelfStyle: 'wood', fonts: ['Georgia'], label: 'Academic Bookshelf' })
         HtmlBookshelf.mountBookshelf(document.querySelector('#old-school'), books, { theme: 'old-school', shelfStyle: 'metal', animation: true, label: 'Old-school Bookshelf' })
         HtmlBookshelf.mountBookshelf(document.querySelector('#mixed'), books, { theme: 'mixed', shelfStyle: 'none', label: 'Mixed Bookshelf' })
-        HtmlBookshelf.mountBookshelf(document.querySelector('#stack'), books, { theme: 'mixed', layout: 'stack', label: 'Stack Bookshelf' })
+        HtmlBookshelf.mountBookshelf(document.querySelector('#stack'), books, { theme: 'mixed', layout: 'stack', animation: true, label: 'Stack Bookshelf' })
       })
     </script>
   </body>

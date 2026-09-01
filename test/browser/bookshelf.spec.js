@@ -99,7 +99,7 @@ test('keeps modern Book Text directly on its artwork without an opaque text pane
   expect(backgrounds).toEqual(['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)'])
 })
 
-test('keeps linked old-school Book Text still on hover in Shelf and Stack Layouts', async ({ page }) => {
+test('keeps linked old-school Book Text fixed within its growing book', async ({ page }) => {
   await page.setContent('<div id="shelf" style="width: 20rem"></div><div id="stack" style="width: 20rem"></div>')
   await page.addScriptTag({ path: 'dist/html-bookshelf.iife.js' })
   await page.evaluate(() => {
@@ -108,21 +108,49 @@ test('keeps linked old-school Book Text still on hover in Shelf and Stack Layout
     window.HtmlBookshelf.mountBookshelf(document.querySelector('#stack'), books, { animation: true, layout: 'stack', theme: 'old-school' })
   })
 
-  const positions = async (root) => page.locator(`${root} .hbs-book-content`).evaluate((content) => ({
-    author: content.querySelector('.hbs-author').getBoundingClientRect().top,
-    title: content.querySelector('.hbs-title').getBoundingClientRect().top
-  }))
   await page.waitForTimeout(550)
-  const before = { shelf: await positions('#shelf'), stack: await positions('#stack') }
-
   await page.locator('#shelf .hbs-book-link').hover()
   await page.waitForTimeout(180)
-  const shelf = await positions('#shelf')
+  await expect(page.locator('#shelf .hbs-book-link')).toHaveCSS('transform', 'none')
+  await expect(page.locator('#shelf .hbs-book')).toHaveCSS('scale', '1.06')
   await page.locator('#stack .hbs-book-link').hover()
   await page.waitForTimeout(180)
-  const stack = await positions('#stack')
+  await expect(page.locator('#stack .hbs-book-link')).toHaveCSS('transform', 'none')
+  await expect(page.locator('#stack .hbs-book')).toHaveCSS('scale', '1.06')
+})
 
-  expect({ shelf, stack }).toEqual(before)
+test('enlarges hovered books without changing Shelf or Stack Layout space', async ({ page }) => {
+  await page.setContent('<div id="shelf" style="width: 20rem"></div><div id="stack" style="width: 20rem"></div>')
+  await page.addScriptTag({ path: 'dist/html-bookshelf.iife.js' })
+  await page.evaluate(() => {
+    const books = [
+      { title: 'Dune', author: 'Frank Herbert', pages: 412 },
+      { title: 'Kindred', author: 'Octavia E. Butler', pages: 288 }
+    ]
+    window.HtmlBookshelf.mountBookshelf(document.querySelector('#shelf'), books, { animation: true, layout: 'shelf' })
+    window.HtmlBookshelf.mountBookshelf(document.querySelector('#stack'), books, { animation: true, layout: 'stack' })
+  })
+
+  const dimensions = async (root) => page.locator(`${root} .hbs-book`).first().evaluate((book) => {
+    const box = book.getBoundingClientRect()
+    return { height: box.height, layoutHeight: book.offsetHeight, layoutWidth: book.offsetWidth, width: box.width }
+  })
+  await page.waitForTimeout(550)
+  const before = { shelf: await dimensions('#shelf'), stack: await dimensions('#stack') }
+
+  await page.locator('#shelf .hbs-book').first().hover()
+  await page.waitForTimeout(180)
+  const shelf = await dimensions('#shelf')
+  await page.locator('#stack .hbs-book').first().hover()
+  await page.waitForTimeout(180)
+  const stack = await dimensions('#stack')
+
+  expect(shelf.width).toBeCloseTo(before.shelf.width * 1.06, 0)
+  expect(shelf.height).toBeCloseTo(before.shelf.height * 1.06, 0)
+  expect(stack.width).toBeCloseTo(before.stack.width * 1.06, 0)
+  expect(stack.height).toBeCloseTo(before.stack.height * 1.06, 0)
+  expect({ layoutHeight: shelf.layoutHeight, layoutWidth: shelf.layoutWidth }).toEqual({ layoutHeight: before.shelf.layoutHeight, layoutWidth: before.shelf.layoutWidth })
+  expect({ layoutHeight: stack.layoutHeight, layoutWidth: stack.layoutWidth }).toEqual({ layoutHeight: before.stack.layoutHeight, layoutWidth: before.stack.layoutWidth })
 })
 
 test('keeps Stack Slab Book Text within the Bookshelf after perspective is applied', async ({ page }) => {

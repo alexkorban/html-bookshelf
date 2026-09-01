@@ -53,6 +53,7 @@ export const sharedStyles = `[data-html-bookshelf] {
   min-inline-size: var(--hbs-min-spine-width);
   overflow: hidden;
   position: relative;
+  transform-origin: bottom center;
 }
 [data-html-bookshelf] .hbs-book::before { display: none; }
 [data-html-bookshelf] .hbs-book--leaning { align-self: flex-end; margin-inline-start: calc(var(--hbs-rendered-height) * sin(var(--hbs-lean-angle)) - var(--hbs-book-gap)); transform: rotate(calc(-1 * var(--hbs-lean-angle))); transform-origin: bottom left; }
@@ -62,7 +63,8 @@ export const sharedStyles = `[data-html-bookshelf] {
 [data-html-bookshelf] .hbs-title { font-size: var(--hbs-title-size); font-weight: 700; line-height: 1.08; overflow-wrap: normal; white-space: nowrap; }
 [data-html-bookshelf] .hbs-author { font-size: var(--hbs-author-size); line-height: 1.15; margin-block-start: 0.45rem; overflow-wrap: anywhere; }
 [data-html-bookshelf] .hbs-book-link:focus-visible { outline: 0.2rem solid #fff; outline-offset: -0.35rem; }
-[data-html-bookshelf][data-hbs-animation="true"] .hbs-book { animation: hbs-enter 180ms ease-out both; animation-delay: var(--hbs-entrance-delay); }
+[data-html-bookshelf][data-hbs-animation="true"] .hbs-book { animation: hbs-enter 180ms ease-out both; animation-delay: var(--hbs-entrance-delay); transition: scale 140ms ease-out; }
+[data-html-bookshelf][data-hbs-animation="true"] .hbs-book:hover, [data-html-bookshelf][data-hbs-animation="true"] .hbs-book:focus-within { scale: 1.06; z-index: 2; }
 [data-html-bookshelf][data-hbs-animation="true"] .hbs-book-link { transition: box-shadow 120ms ease-out, transform 120ms ease-out; }
 [data-html-bookshelf][data-hbs-animation="true"] .hbs-book-link:hover, [data-html-bookshelf][data-hbs-animation="true"] .hbs-book-link:focus-visible { box-shadow: 0 -0.18rem 0.42rem #0007; transform: translateY(-0.12rem); }
 [data-html-bookshelf][data-hbs-animation="true"] .hbs-theme-old-school .hbs-book-link:hover, [data-html-bookshelf][data-hbs-animation="true"] .hbs-theme-old-school .hbs-book-link:focus-visible { transform: none; }

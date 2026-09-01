@@ -429,8 +429,9 @@ Animation is off by default. When `animation: true`:
 
 - Each book has one entrance animation of 180 ms with an ease-out curve.
 - Entrance delays use seeded 25 ms steps and are capped at 300 ms.
-- Linked Books lift slightly and gain a stronger shadow on hover and keyboard
-  focus over 120 ms.
+- Books grow by 6% on hover and linked Books also grow on keyboard focus, without
+  changing the Shelf or Stack Layout. Linked Books lift slightly and gain a
+  stronger shadow over 120 ms.
 - There are no looping or continuous animations.
 - `prefers-reduced-motion: reduce` disables all package animation, even when
   the option is enabled.
@@ -518,4 +519,3 @@ Version 1 is complete when all of the following are true:
 - The package ships ESM, the `HtmlBookshelf` IIFE, the CLI, and `styles.css`.
 - The Vitest and Playwright suites pass, and the examples page demonstrates
   every supported visual mode.
-
