@@ -1,14 +1,13 @@
 # @alexkorban/html-bookshelf
 
-Render an ordered Book Collection as an accessible, responsive HTML and CSS
-Bookshelf. It has no network dependency and does not modify the Book
-Collection.
+Render an ordered book collection as an accessible, responsive HTML and CSS
+bookshelf.
 
 ```js
 import { bookshelfFragment } from '@alexkorban/html-bookshelf'
 
 const [ok, fragment] = bookshelfFragment([
-  { title: 'Dune', author: 'Frank Herbert', pages: 412, url: '/books/dune' }
+  { title: 'Diaspora', author: 'Greg Egan', pages: 412, url: '/books/dune' }
 ], { theme: 'modern', layout: 'auto', label: 'Reading list' })
 ```
 
@@ -29,7 +28,8 @@ arbitrary Stack Layout threshold.
 ## Command line
 
 ```sh
-html-bookshelf books.json --theme mixed --font Aptos --font Merriweather \
+npx @alexkorban/html-bookshelf books.json --theme mixed \
+  --font Aptos --font Merriweather \
   --label "2026 reading list" --document --output bookshelf.html
 ```
 

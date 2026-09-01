@@ -6,17 +6,33 @@ import { resolve } from 'node:path'
 import * as R from 'ramda'
 import { bookshelfFragment } from './bookshelf-fragment.js'
 
-const optionFlags = {
-  '--theme': 'theme',
-  '--layout': 'layout',
-  '--shelf-style': 'shelfStyle',
-  '--seed': 'seed',
-  '--min-spine-width': 'minSpineWidth',
-  '--stack-threshold': 'stackThreshold',
-  '--spine-height': 'spineHeight',
-  '--label': 'label',
-  '--style': 'style'
-}
+const optionDefinitions = [
+  { flag: '--help', syntax: '--help', description: 'Show this help text.' },
+  { flag: '--theme', syntax: '--theme <name>', description: 'Select the bookshelf theme.', option: 'theme' },
+  { flag: '--layout', syntax: '--layout <name>', description: 'Select the bookshelf layout.', option: 'layout' },
+  { flag: '--shelf-style', syntax: '--shelf-style <name>', description: 'Select the visual style for shelves.', option: 'shelfStyle' },
+  { flag: '--seed', syntax: '--seed <value>', description: 'Set the seed for deterministic visual variation.', option: 'seed' },
+  { flag: '--min-spine-width', syntax: '--min-spine-width <length>', description: 'Set the minimum width of each book spine.', option: 'minSpineWidth' },
+  { flag: '--stack-threshold', syntax: '--stack-threshold <length>', description: 'Set the width at which books use the Stack Layout.', option: 'stackThreshold' },
+  { flag: '--spine-height', syntax: '--spine-height <length>', description: 'Set the height of each book spine.', option: 'spineHeight' },
+  { flag: '--label', syntax: '--label <text>', description: 'Set the accessible label for the bookshelf.', option: 'label' },
+  { flag: '--style', syntax: '--style <mode>', description: 'Select how the bookshelf CSS is included.', option: 'style' },
+  { flag: '--font', syntax: '--font <family>', description: 'Add a family to the Font Cycle; repeat this option to add more families.' },
+  { flag: '--document', syntax: '--document', description: 'Wrap the bookshelf markup in a complete HTML document.' },
+  { flag: '--animation', syntax: '--animation', description: 'Enable the bookshelf animation.' },
+  { flag: '--output', syntax: '--output <file>', description: 'Write the result to a file instead of standard output.' }
+]
+
+const optionFlags = R.pipe(
+  R.filter((definition) => definition.option !== undefined),
+  R.map((definition) => [definition.flag, definition.option]),
+  R.fromPairs
+)(optionDefinitions)
+
+const helpText = `Usage: html-bookshelf <books.json|-> [options]\n\nOptions:\n${R.pipe(
+  R.map((definition) => `  ${definition.syntax.padEnd(32)}${definition.description}`),
+  R.join('\n')
+)(optionDefinitions)}\n`
 
 const argumentState = (state, argument) => {
   if (state.error !== undefined) return state
@@ -24,7 +40,7 @@ const argumentState = (state, argument) => {
   if (state.pending === '--output') return R.pipe(R.assoc('output', argument), R.assoc('pending', undefined))(state)
   if (state.pending !== undefined) return R.pipe(R.assoc('options', R.assoc(R.prop(state.pending, optionFlags), argument, state.options)), R.assoc('pending', undefined))(state)
   if (argument === '--document') return R.assoc('document', true, state)
-  if (argument === '--animate') return R.assoc('options', R.assoc('animation', true, state.options), state)
+  if (argument === '--animation') return R.assoc('options', R.assoc('animation', true, state.options), state)
   if (argument === '--font' || argument === '--output' || R.has(argument, optionFlags)) return R.assoc('pending', argument, state)
   if (R.startsWith('--', argument)) return R.assoc('error', `unknown option ${argument}`, state)
   if (state.input === undefined) return R.assoc('input', argument, state)
@@ -33,6 +49,7 @@ const argumentState = (state, argument) => {
 
 /** @param {string[]} argumentsList */
 export const commandArguments = (argumentsList) => {
+  if (R.includes('--help', argumentsList)) return [true, { help: true }]
   const initialState = { input: undefined, output: undefined, document: false, fonts: [], options: {}, pending: undefined, error: undefined }
   const state = R.reduce(argumentState, initialState, argumentsList)
   if (state.error !== undefined) return [false, state.error]
@@ -61,6 +78,10 @@ export const runCommand = async (argumentsList, io) => {
   if (!parsed[0]) {
     io.stderr(`html-bookshelf: ${parsed[1]}\n`)
     return 1
+  }
+  if (parsed[1].help === true) {
+    io.stdout(helpText)
+    return 0
   }
   const { input, output, document, options } = parsed[1]
   let inputText
@@ -97,14 +118,18 @@ export const runCommand = async (argumentsList, io) => {
 }
 
 if (process.argv[1] !== undefined && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
-  const stdin = await new Promise((resolveInput, reject) => {
-    let text = ''
-    process.stdin.setEncoding('utf8')
-    process.stdin.on('data', (chunk) => { text += chunk })
-    process.stdin.on('end', () => resolveInput(text))
-    process.stdin.on('error', reject)
-  })
-  process.exitCode = await runCommand(R.slice(2, R.length(process.argv), process.argv), {
+  const argumentsList = R.slice(2, R.length(process.argv), process.argv)
+  const parsed = commandArguments(argumentsList)
+  const stdin = parsed[0] && parsed[1].input === '-'
+    ? await new Promise((resolveInput, reject) => {
+      let text = ''
+      process.stdin.setEncoding('utf8')
+      process.stdin.on('data', (chunk) => { text += chunk })
+      process.stdin.on('end', () => resolveInput(text))
+      process.stdin.on('error', reject)
+    })
+    : ''
+  process.exitCode = await runCommand(argumentsList, {
     stdin,
     stdout: (value) => process.stdout.write(value),
     stderr: (value) => process.stderr.write(value)
