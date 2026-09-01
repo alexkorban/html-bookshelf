@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HTML Bookshelf examples</title>
+    <link rel="stylesheet" href="../dist/styles.css">
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem auto; max-width: 70rem; padding: 0 1rem; } .example { margin: 2rem 0; max-width: 42rem; }
+    </style>
+  </head>
+  <body>
+    <h1>HTML Bookshelf examples</h1>
+    <h2>Text along the spine</h2>
+    <div class="example" id="vertical-spine"></div>
+    <h2>Across Spine Text</h2>
+    <div class="example" id="across-spine"></div>
+    <h2>Theme examples</h2>
+    <div class="example" id="modern"></div>
+    <div class="example" id="academic"></div>
+    <div class="example" id="old-school"></div>
+    <div class="example" id="mixed"></div>
+    <div class="example" id="stack"></div>
+    <script src="../dist/html-bookshelf.iife.js"></script>
+    <script>
+      fetch('./books.json').then((response) => response.json()).then((books) => {
+        const verticalSpines = [
+          { title: 'Extraordinary', author: 'Alexanderson', pages: 340 },
+          { title: 'Unconventional', author: 'Thompson', pages: 280 },
+          { title: 'Metamorphosis', author: 'Katherine', pages: 212 },
+          { title: 'Architecture', author: 'Montgomery', pages: 456 }
+        ]
+        const acrossSpines = [
+          { title: 'Dune', author: 'Frank Herbert', pages: 412 },
+          { title: 'Kindred', author: 'Octavia Butler', pages: 288 },
+          { title: 'Piranesi', author: 'Susanna Clarke', pages: 272 }
+        ]
+        HtmlBookshelf.mountBookshelf(document.querySelector('#vertical-spine'), verticalSpines, { theme: 'modern', layout: 'shelf', shelfStyle: 'wood', label: 'Vertical spine text' })
+        HtmlBookshelf.mountBookshelf(document.querySelector('#across-spine'), acrossSpines, { theme: 'modern', layout: 'shelf', shelfStyle: 'wood', label: 'Across Spine Text' })
+        HtmlBookshelf.mountBookshelf(document.querySelector('#modern'), books, { theme: 'modern', shelfStyle: 'abstract', label: 'Modern Bookshelf' })
+        HtmlBookshelf.mountBookshelf(document.querySelector('#academic'), books, { theme: 'academic', shelfStyle: 'wood', fonts: ['Georgia'], label: 'Academic Bookshelf' })
+        HtmlBookshelf.mountBookshelf(document.querySelector('#old-school'), books, { theme: 'old-school', shelfStyle: 'metal', animation: true, label: 'Old-school Bookshelf' })
+        HtmlBookshelf.mountBookshelf(document.querySelector('#mixed'), books, { theme: 'mixed', shelfStyle: 'none', label: 'Mixed Bookshelf' })
+        HtmlBookshelf.mountBookshelf(document.querySelector('#stack'), books, { theme: 'mixed', layout: 'stack', label: 'Stack Bookshelf' })
+      })
+    </script>
+  </body>
+</html>

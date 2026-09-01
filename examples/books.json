@@ -1,0 +1,10 @@
+[
+  { "title": "Dune", "author": "Frank Herbert", "pages": 412, "url": "https://example.com/dune" },
+  { "title": "Kindred", "author": "Octavia E. Butler", "pages": 288 },
+  { "title": "The Left Hand of Darkness", "author": "Ursula K. Le Guin", "pages": 304 },
+  { "title": "Piranesi", "author": "Susanna Clarke", "pages": 272 },
+  { "title": "The Dispossessed", "author": "Ursula K. Le Guin", "pages": 341 },
+  { "title": "The Fifth Season", "author": "N.K. Jemisin", "pages": 1000 },
+  { "title": "The Power", "author": "Naomi Alderman", "pages": 352 },
+  { "title": "The City We Became", "author": "N.K. Jemisin", "pages": 448 }
+]
