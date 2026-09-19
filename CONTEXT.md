@@ -75,10 +75,11 @@ individual book spines vary by a deterministic amount of up to 8%.
 _Avoid_: book height, shelf height
 
 **Relative Thickness**:
-The visual width weight of a Book Entry derived from its page count. It is the
-page count divided by 200, clamped from 0.6 to 5, before a shelf fills its
-available width. An upright spine normally cannot exceed 42% of its rendered
-height, unless the caller's Minimum Spine Width is larger.
+The visual width weight of a Book Entry: its page count divided by 200,
+clamped from 0.6 to 5, with one thickness scale and shared width limits across
+all rows so equal page counts produce equal spine widths without stretching.
+The shared upper limit is at most 42% of the shortest permitted spine height,
+unless the caller's Minimum Spine Width is larger.
 _Avoid_: page width, physical thickness
 
 **Across Spine Text**:

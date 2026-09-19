@@ -11,6 +11,17 @@
   </head>
   <body>
     <h1>HTML Bookshelf examples</h1>
+    <h2>HTML list with a no-JS fallback</h2>
+    <ol id="reading-list">
+      <li data-hbs-pages="412">
+        <a data-hbs-title href="https://en.wikipedia.org/wiki/Dune_(novel)">Dune</a>
+        by <span data-hbs-author>Frank Herbert</span>
+      </li>
+      <li data-hbs-pages="288">
+        <a data-hbs-title href="https://en.wikipedia.org/wiki/Kindred_(novel)">Kindred</a>
+        by <span data-hbs-author>Octavia E. Butler</span>
+      </li>
+    </ol>
     <h2>Text along the spine</h2>
     <div class="example" id="vertical-spine"></div>
     <h2>Across Spine Text</h2>
@@ -23,6 +34,7 @@
     <div class="example" id="stack"></div>
     <script src="../dist/html-bookshelf.iife.js"></script>
     <script>
+      HtmlBookshelf.mountBookshelfFromList(document.querySelector('#reading-list'), { theme: 'modern', label: 'Reading list' })
       fetch('./books.json').then((response) => response.json()).then((books) => {
         const verticalSpines = [
           { title: 'Extraordinary', author: 'Alexanderson', pages: 340 },

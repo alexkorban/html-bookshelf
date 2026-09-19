@@ -1,3 +1,3 @@
-import { bookshelfFragment, mountBookshelf } from './index.js'
+import { bookshelfFragment, mountBookshelf, mountBookshelfFromList } from './index.js'
 
-export { bookshelfFragment, mountBookshelf }
+export { bookshelfFragment, mountBookshelf, mountBookshelfFromList }

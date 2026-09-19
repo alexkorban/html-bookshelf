@@ -8,6 +8,9 @@ export const sharedStyles = `[data-html-bookshelf] {
 [data-html-bookshelf] *, [data-html-bookshelf] *::before, [data-html-bookshelf] *::after { box-sizing: border-box; }
 [data-html-bookshelf] .hbs-list {
   --hbs-book-gap: 0.2rem;
+  --hbs-thickness-unit: 2rem;
+  /* Use the shortest possible spine height for a shared, proportional cap. */
+  --hbs-max-spine-width: max(var(--hbs-min-spine-width), min(7rem, 22cqi, calc(var(--hbs-spine-height) * 0.92 * 0.42)));
   --hbs-row-height: calc(var(--hbs-spine-height) * 1.08);
   --hbs-row-pitch: calc(var(--hbs-row-height) + 0.55rem + var(--hbs-shelf-thickness));
   --hbs-shelf-thickness: 0.35rem;
@@ -38,8 +41,8 @@ export const sharedStyles = `[data-html-bookshelf] {
   align-items: flex-end;
   block-size: var(--hbs-row-height);
   display: flex;
-  flex: var(--hbs-thickness) 1 var(--hbs-min-spine-width);
-  max-inline-size: max(var(--hbs-min-spine-width), min(7rem, 22cqi, calc(var(--hbs-rendered-height) * 0.42)));
+  flex: 0 0 clamp(var(--hbs-min-spine-width), calc(var(--hbs-thickness-unit) * var(--hbs-thickness)), var(--hbs-max-spine-width));
+  max-inline-size: var(--hbs-max-spine-width);
   min-inline-size: var(--hbs-min-spine-width);
   position: relative;
 }

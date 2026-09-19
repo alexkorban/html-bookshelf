@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { bookshelfFragment } from './bookshelf-fragment.js'
+import { installBookshelfFragment } from './install-bookshelf-fragment.js'
 
 /**
  * Mount a rendered Bookshelf into an HTML element.
@@ -20,14 +21,6 @@ export const mountBookshelf = (targetElement, bookCollection, options) => {
   const result = bookshelfFragment(bookCollection, options)
   if (!result[0]) return result
 
-  const document = targetElement.ownerDocument
-  const template = document.createElement('template')
-  template.innerHTML = result[1]
-  const sharedStyle = template.content.querySelector('style[data-html-bookshelf-styles]')
-  if (sharedStyle !== null) {
-    if (document.head.querySelector('style[data-html-bookshelf-styles]') === null) document.head.append(sharedStyle.cloneNode(true))
-    sharedStyle.remove()
-  }
-  targetElement.replaceChildren(template.content.cloneNode(true))
+  targetElement.replaceChildren(installBookshelfFragment(targetElement.ownerDocument, result[1]))
   return [true, null]
 }
